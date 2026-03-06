@@ -1,3 +1,0 @@
-.class interface abstract synthetic Lcom/android/server/wm/package-info;
-.super Ljava/lang/Object;
-.source "package-info.java"
