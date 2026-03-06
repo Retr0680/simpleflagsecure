@@ -1,0 +1,132 @@
+.class Lcom/android/server/power/ShutdownThread$Injector;
+.super Ljava/lang/Object;
+.source "ShutdownThread.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/android/server/power/ShutdownThread;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x8
+    name = "Injector"
+.end annotation
+
+
+# direct methods
+.method constructor <init>()V
+    .locals 0
+
+    .line 1022
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public getDefaultShutdownVibrationEffectFilePath(Landroid/content/Context;)Ljava/lang/String;
+    .locals 2
+    .param p1, "context"    # Landroid/content/Context;
+
+    .line 1036
+    invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v0
+
+    const v1, 0x1040253
+
+    invoke-virtual {v0, v1}, Landroid/content/res/Resources;->getString(I)Ljava/lang/String;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public getVibrator(Landroid/content/Context;)Landroid/os/Vibrator;
+    .locals 1
+    .param p1, "context"    # Landroid/content/Context;
+
+    .line 1024
+    new-instance v0, Landroid/os/SystemVibrator;
+
+    invoke-direct {v0, p1}, Landroid/os/SystemVibrator;-><init>(Landroid/content/Context;)V
+
+    return-object v0
+.end method
+
+.method public isShutdownVibrationDisabled(Landroid/content/Context;)Z
+    .locals 4
+    .param p1, "context"    # Landroid/content/Context;
+
+    .line 1041
+    invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v0
+
+    const v1, 0x111013f
+
+    invoke-virtual {v0, v1}, Landroid/content/res/Resources;->getBoolean(I)Z
+
+    move-result v0
+
+    .line 1043
+    .local v0, "disabledInConfig":Z
+    invoke-virtual {p1}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
+
+    move-result-object v1
+
+    const-string/jumbo v2, "zen_mode"
+
+    const/4 v3, 0x0
+
+    invoke-static {v1, v2, v3}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+
+    move-result v1
+
+    const/4 v2, 0x1
+
+    if-eqz v1, :cond_0
+
+    move v1, v2
+
+    goto :goto_0
+
+    :cond_0
+    move v1, v3
+
+    .line 1046
+    .local v1, "isZenMode":Z
+    :goto_0
+    if-eqz v0, :cond_1
+
+    if-eqz v1, :cond_1
+
+    move v3, v2
+
+    :cond_1
+    return v3
+.end method
+
+.method public sleep(J)V
+    .locals 1
+    .param p1, "durationMs"    # J
+
+    .line 1029
+    :try_start_0
+    invoke-static {p1, p2}, Ljava/lang/Thread;->sleep(J)V
+    :try_end_0
+    .catch Ljava/lang/InterruptedException; {:try_start_0 .. :try_end_0} :catch_0
+
+    .line 1032
+    goto :goto_0
+
+    .line 1030
+    :catch_0
+    move-exception v0
+
+    .line 1033
+    :goto_0
+    return-void
+.end method
