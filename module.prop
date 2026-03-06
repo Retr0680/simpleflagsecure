@@ -2,5 +2,5 @@ id=flagsecure_disable
 name=Disable FLAG_SECURE
 version=1.0
 versionCode=1
-author=Retr0
+author=Retr0_680
 description=Disables Android FLAG_SECURE so screenshots work everywhere
