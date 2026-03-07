@@ -1,142 +1,140 @@
-# Disable FLAG_SECURE (KernelSU Module)
+# SimpleFlagSecure
 
-A simple KernelSU module that disables Android's `FLAG_SECURE` restriction, allowing screenshots and screen recording in apps that normally block them.
+Disable Android `FLAG_SECURE` restrictions and take screenshots or record screens in apps that normally block it.
 
-This module works by patching the Android framework so the system always reports that a window is **not secure**. As a result, the system compositor allows screenshots even if an app tries to block them.
-
----
-
-## How It Works
-
-Android applications can set a flag called `FLAG_SECURE` in their window parameters:
-
-```
-WindowManager.LayoutParams.FLAG_SECURE
-```
-
-When this flag is enabled, Android prevents:
-
-* Screenshots
-* Screen recording
-* Screen sharing
-
-This module modifies the system framework method responsible for checking secure windows:
-
-```
-com.android.server.wm.WindowState.isSecureLocked()
-```
-
-The method is patched to always return:
-
-```
-false
-```
-
-Meaning the system behaves as if **no window is secure**, allowing screenshots everywhere.
+This module dynamically patches the Android framework during installation so the system no longer treats windows as **secure**, allowing screenshots and screen recordings in restricted apps.
 
 ---
 
 ## Features
 
-* Works system-wide
-* No LSPosed required
-* KernelSU compatible
-* Lightweight (framework override only)
+* Disable `FLAG_SECURE` screenshot restriction
+* Enable screenshots in restricted apps
+* Block screenshot detection on newer Android versions
+* Dynamic patching of `services.jar`
+* Lightweight module with minimal footprint
+* Works with multiple root managers
 
 ---
 
-## Requirements
+## Supported Root Managers
 
-* Root access
-* KernelSU installed
-* Android device with compatible framework structure
+* Magisk
+* KernelSU
+* APatch
+
+---
+
+## Supported Android Versions
+
+Tested primarily on modern Android versions where screenshot restrictions are enforced through framework checks.
+
+Compatibility may vary depending on OEM modifications.
+
+---
+
+## How It Works
+
+Android apps can prevent screenshots by setting a secure window flag:
+
+```
+WindowManager.LayoutParams.FLAG_SECURE
+```
+
+When this flag is present, the system blocks:
+
+* Screenshots
+* Screen recording
+* Screen sharing
+
+This module modifies framework methods responsible for checking this flag and forces them to return `false`, making the system behave as if no window is secure.
+
+Instead of shipping a pre-patched framework file, the module:
+
+1. Extracts the device's framework `services.jar`
+2. Decompiles it during installation
+3. Patches relevant methods
+4. Rebuilds the modified jar
+5. Overlays it through the module system
+
+This approach improves compatibility across devices and ROMs.
 
 ---
 
 ## Installation
 
-1. Download the module zip.
-2. Open **KernelSU Manager**.
-3. Go to **Modules**.
-4. Tap **Install from storage**.
-5. Select the module zip.
-6. Reboot the device.
+1. Download the latest module release.
+2. Open your root manager:
+
+   * Magisk
+   * KernelSU
+   * APatch
+3. Go to **Modules → Install from storage**.
+4. Select the module zip.
+5. Reboot your device.
 
 ---
 
-## Module Structure
+## Testing
 
-```
-flagsecure-disable/
-├── module.prop
-└── system/
-    └── framework/
-        └── services.jar
-```
+After reboot:
 
-The module overlays a patched `services.jar` over the system framework during boot.
+Try taking screenshots in apps that normally block them, such as:
 
----
+* Banking apps
+* Incognito mode in browsers
+* Messaging apps with secure chats
 
-## Building From Source
-
-1. Pull the framework file:
-
-```
-adb pull /system/framework/services.jar
-```
-
-2. Decompile it using apktool:
-
-```
-apktool d services.jar
-```
-
-3. Edit:
-
-```
-smali_classes*/com/android/server/wm/WindowState.smali
-```
-
-4. Modify the method:
-
-```
-.method isSecureLocked()Z
-    .locals 1
-    const/4 v0, 0x0
-    return v0
-.end method
-```
-
-5. Rebuild:
-
-```
-apktool b services
-```
-
-6. Place the rebuilt jar in:
-
-```
-system/framework/services.jar
-```
+If the screenshot is no longer black or blocked, the module is working.
 
 ---
 
-## Limitations
+## Troubleshooting
 
-Some apps may still block screenshots using deeper protection mechanisms such as:
+### Module Installed but Screenshots Still Black
 
-* DRM protected buffers
-* Hardware secure layers
-* MediaProjection detection
+Some apps use deeper DRM protections that cannot be bypassed by framework patches alone.
 
-Examples include certain streaming apps.
+Try testing with:
+
+* Chrome Incognito
+* WhatsApp profile photos
+* Telegram secret chats
+
+If those work but a specific app does not, that app likely uses hardware DRM layers.
+
+---
+
+### Bootloop
+
+If the device fails to boot:
+
+1. Boot into recovery
+2. Navigate to:
+
+```
+/data/adb/modules/
+```
+
+3. Delete the module folder
+4. Reboot the system
 
 ---
 
 ## Disclaimer
 
-This module modifies Android framework behavior. Use at your own risk. The author is not responsible for any damage or misuse.
+This module modifies Android framework behavior.
+Use it at your own risk.
+
+Some applications rely on screenshot blocking for security purposes.
+
+---
+
+## Credits
+
+* Android open-source community
+* Developers of previous FLAG_SECURE bypass modules
+* Contributors and testers
 
 ---
 
