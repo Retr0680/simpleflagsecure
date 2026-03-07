@@ -1,0 +1,4 @@
+Project:  FLAG_SECURE
+Docs:     https://retr0680.github.io/simpleflagsecure
+Version:  Stable - 1.1
+Author:   @Retr0_680
